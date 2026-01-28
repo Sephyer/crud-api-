@@ -9,8 +9,11 @@ load_dotenv(dotenv_path)  # Load environment variables from .env
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 if not DATABASE_URL:
-    raise ValueError("DATABASE_URL not found. Check your .env file!")
+    # Friendly default for quick local runs (no Postgres required).
+    # You can still override this with a `.env` file or environment variable.
+    DATABASE_URL = "sqlite:///./test.db"
 
-engine = create_engine(DATABASE_URL)
+connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
+engine = create_engine(DATABASE_URL, connect_args=connect_args)
 SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 Base = declarative_base()

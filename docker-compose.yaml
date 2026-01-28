@@ -1,0 +1,29 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: crud
+      POSTGRES_PASSWORD: crud
+      POSTGRES_DB: crud
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U crud -d crud"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: .
+    environment:
+      DATABASE_URL: postgresql+psycopg2://crud:crud@db:5432/crud
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+
+volumes:
+  postgres_data:

@@ -8,14 +8,28 @@ def create_item(db: Session, item: schemas.ItemCreate):
     db.refresh(db_item)
     return db_item
 
+def get_items(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Item).offset(skip).limit(limit).all()
+
 def get_item(db: Session, item_id: int):
     return db.query(models.Item).filter(models.Item.id == item_id).first()
 
-def update_item(db: Session, item_id: int, item: schemas.ItemCreate):
+def replace_item(db: Session, item_id: int, item: schemas.ItemCreate):
     db_item = get_item(db, item_id)
     if db_item:
         db_item.name = item.name
         db_item.description = item.description
+        db.commit()
+        db.refresh(db_item)
+    return db_item
+
+def update_item(db: Session, item_id: int, item: schemas.ItemUpdate):
+    db_item = get_item(db, item_id)
+    if db_item:
+        # Only update fields that were provided
+        updates = item.model_dump(exclude_unset=True)
+        for key, value in updates.items():
+            setattr(db_item, key, value)
         db.commit()
         db.refresh(db_item)
     return db_item

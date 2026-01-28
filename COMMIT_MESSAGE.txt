@@ -1,0 +1,6 @@
+Add Docker support and improve CRUD API
+
+- Add Dockerfile and docker-compose for API + Postgres
+- Improve request handling (list, health, PATCH, status codes, CORS)
+- Add .env.example and ignore local venv/db artifacts
+
